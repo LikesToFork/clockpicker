@@ -357,6 +357,20 @@
 			this.canvas = canvas;
 		}
 
+		var noop = function () {};
+		var isFunction = function (callbackFunction) {
+		    return callbackFunction && typeof callbackFunction === "function";
+		};
+
+		[
+		    'init', 'beforeShow', 'afterShow', 'beforeHide', 'afterHide',
+		    'beforeHourSelect', 'afterHourSelect', 'beforeDone', 'afterDone'
+		].forEach(function(callbackName) {
+		    var callback = this.options[callbackName];
+		    callback = isFunction(callback) ? callback.bind(this) : noop;
+		    this.options[callbackName] = callback;
+		}.bind(this));
+		
 		raiseCallback(this.options.init);
 	}
 
