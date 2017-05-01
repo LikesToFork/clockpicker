@@ -1,5 +1,5 @@
 /*!
- * ClockPicker v{package.version} (http://weareoutman.github.io/clockpicker/)
+ * ClockPicker v0.0.7 (http://weareoutman.github.io/clockpicker/)
  * Copyright 2014 Wang Shenwei.
  * Licensed under MIT (https://github.com/weareoutman/clockpicker/blob/gh-pages/LICENSE)
  */
@@ -71,8 +71,8 @@
 			'<div class="popover-title">',
 				'<span class="clockpicker-span-hours text-primary"></span>',
 				' : ',
-				'<span class="clockpicker-span-minutes"></span>',
-				'<span class="clockpicker-span-am-pm"></span>',
+				' <span class="clockpicker-span-minutes"></span>',
+				' <span class="clockpicker-span-am-pm"></span>',
 			'</div>',
 			'<div class="popover-content">',
 				'<div class="clockpicker-plate">',
@@ -239,6 +239,11 @@
 			}
 		});
 
+		function setMeridian(meridian) {
+			var buttonClass = '.' + meridian.toLowerCase() + '-button';
+			self.amPmBlock.find(buttonClass).trigger('click');
+		}
+		
 		// Mousedown or touchstart
 		function mousedown(e, space) {
 			var offset = plate.offset(),
@@ -463,7 +468,22 @@
 			];
 		}
 		this.hours = + value[0] || 0;
-		this.minutes = + value[1] || 0;
+		if (value[1]) {
+			if (!$.isNumeric(value[1])) {
+				this.amOrPm = value[1].replace(/[0-9]/g, '').trim();
+				this.minutes = + value[1].replace(/[a-zA-Z]/g, '').trim();
+			} else {
+				this.minutes = + value[1];
+			}
+		} else {
+			this.minutes = 0;			
+		}
+		
+		if (this.amOrPm) {
+			var buttonClass = '.' + this.amOrPm.toLowerCase() + '-button';
+			this.amPmBlock.find(buttonClass).click();
+		}
+
 		this.spanHours.html(leadingZero(this.hours));
 		this.spanMinutes.html(leadingZero(this.minutes));
 
@@ -677,7 +697,7 @@
 		var last = this.input.prop('value'),
 			value = leadingZero(this.hours) + ':' + leadingZero(this.minutes);
 		if  (this.options.twelvehour) {
-			value = value + this.amOrPm;
+			value = value + ' ' + this.amOrPm;
 		}
 		
 		this.input.prop('value', value);
